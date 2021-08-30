@@ -1,0 +1,990 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "API",
+    "version": "v1"
+  },
+  "host": "127.0.0.1:8000",
+  "schemes": [
+    "http"
+  ],
+  "basePath": "/api",
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "securityDefinitions": {
+    "Bearer": {
+      "type": "apiKey",
+      "name": "Authorization",
+      "in": "header",
+      "description": ""
+    }
+  },
+  "security": [
+    {
+      "Bearer": []
+    }
+  ],
+  "paths": {
+    "/users/me/": {
+      "get": {
+        "operationId": "users_me_read",
+        "description": "Получение информации о пользователе",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Возвращает идентификатор пользователя и логин",
+            "schema": {
+              "$ref": "#/definitions/UserInfo"
+            },
+            "examples": {},
+            "headers": {}
+          }
+        },
+        "tags": [
+          "users"
+        ],
+        "summary": "Пользователь"
+      },
+      "parameters": []
+    },
+    "/users/registration/": {
+      "post": {
+        "operationId": "users_registration_create",
+        "description": "Регистрация пользователя",
+        "parameters": [
+          {
+            "name": "data",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/UserCreate"
+            },
+            "description": "Для регистрации пользователя необходимо почта, логин, и пароль"
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Ответ состоит из почты и логина созданного пользователя ",
+            "schema": {
+              "description": "",
+              "type": "object",
+              "x-examples": {
+                "example-1": {
+                  "email": "ilya1@test.ru",
+                  "username": "ilya1"
+                }
+              },
+              "properties": {
+                "email": {
+                  "type": "string",
+                  "minLength": 1,
+                  "format": "email"
+                },
+                "username": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "required": [
+                "email",
+                "username"
+              ]
+            }
+          }
+        },
+        "tags": [
+          "users"
+        ],
+        "x-internal": false,
+        "summary": "Регистрация"
+      },
+      "parameters": []
+    },
+    "/users/token/": {
+      "post": {
+        "operationId": "users_token_create",
+        "description": "Принимает учётные данные, и возвращщает пару токенов (access и refresh)",
+        "parameters": [
+          {
+            "name": "data",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/TokenObtainPair"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/TokenRefresh"
+            }
+          }
+        },
+        "tags": [
+          "users"
+        ],
+        "summary": "Получить токены"
+      },
+      "parameters": []
+    },
+    "/users/token/refresh/": {
+      "post": {
+        "operationId": "users_token_refresh_create",
+        "description": "Принимает refresh токен, возвращает access токен",
+        "parameters": [
+          {
+            "name": "data",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "refresh": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/TokenRefresh"
+            }
+          }
+        },
+        "tags": [
+          "users"
+        ],
+        "summary": "Обновить токен доступа"
+      },
+      "parameters": []
+    },
+    "/transactions/category": {
+      "get": {
+        "operationId": "transactions_category_list",
+        "description": "Получить список категорий",
+        "parameters": [
+          {
+            "$ref": "#/parameters/start_date"
+          },
+          {
+            "$ref": "#/parameters/end_date"
+          },
+          {
+            "$ref": "#/parameters/limit"
+          },
+          {
+            "$ref": "#/parameters/offset"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "required": [
+                "count",
+                "results"
+              ],
+              "type": "object",
+              "properties": {
+                "count": {
+                  "type": "integer"
+                },
+                "next": {
+                  "type": "string",
+                  "format": "uri",
+                  "x-nullable": true
+                },
+                "previous": {
+                  "type": "string",
+                  "format": "uri",
+                  "x-nullable": true
+                },
+                "results": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/definitions/Category"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "summary": "Получить список категорий",
+        "tags": [
+          "categories"
+        ]
+      },
+      "post": {
+        "operationId": "transactions_category_create",
+        "description": "Создать категорию",
+        "parameters": [
+          {
+            "name": "data",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/Category"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/Category"
+            }
+          }
+        },
+        "tags": [
+          "categories"
+        ],
+        "summary": "Создать категорию"
+      },
+      "parameters": []
+    },
+    "/transactions/category/{id}/": {
+      "delete": {
+        "operationId": "transactions_category_delete",
+        "description": "Удалить категорию",
+        "parameters": [],
+        "responses": {
+          "204": {
+            "description": ""
+          },
+          "404": {
+            "description": "Not Found",
+            "schema": {
+              "type": "object",
+              "properties": {}
+            }
+          }
+        },
+        "tags": [
+          "categories"
+        ],
+        "summary": "Удалить категорию"
+      },
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "type": "integer"
+        }
+      ]
+    },
+    "/transactions/category/get_summary_categories/": {
+      "get": {
+        "operationId": "transactions_category_get_summary_categories",
+        "description": "Список категорий и сумма всех транзакций по каждой категории",
+        "parameters": [
+          {
+            "$ref": "#/parameters/start_date"
+          },
+          {
+            "$ref": "#/parameters/end_date"
+          },
+          {
+            "$ref": "#/parameters/limit"
+          },
+          {
+            "$ref": "#/parameters/offset"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "type": "array",
+              "description": "",
+              "minItems": 1,
+              "uniqueItems": true,
+              "x-examples": {
+                "example-1": [
+                  {
+                    "title": "IN 1",
+                    "type": "IN",
+                    "amount": 350
+                  },
+                  {
+                    "title": "EX 1",
+                    "type": "EX",
+                    "amount": 600
+                  }
+                ]
+              },
+              "items": {
+                "type": "object",
+                "properties": {
+                  "title": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "type": {
+                    "type": "string"
+                  },
+                  "amount": {
+                    "type": "integer"
+                  }
+                },
+                "required": [
+                  "title",
+                  "type",
+                  "amount"
+                ]
+              }
+            }
+          }
+        },
+        "tags": [
+          "categories"
+        ],
+        "summary": "Список категорий и сумма всех транзакций по каждой категории"
+      },
+      "parameters": []
+    },
+    "/transactions/transaction/": {
+      "get": {
+        "operationId": "transactions_transaction_list",
+        "description": "Получить транзакции",
+        "parameters": [
+          {
+            "$ref": "#/parameters/start_date"
+          },
+          {
+            "$ref": "#/parameters/end_date"
+          },
+          {
+            "$ref": "#/parameters/limit"
+          },
+          {
+            "$ref": "#/parameters/offset"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "required": [
+                "count",
+                "results"
+              ],
+              "type": "object",
+              "properties": {
+                "count": {
+                  "type": "integer"
+                },
+                "next": {
+                  "type": "string",
+                  "format": "uri",
+                  "x-nullable": true
+                },
+                "previous": {
+                  "type": "string",
+                  "format": "uri",
+                  "x-nullable": true
+                },
+                "results": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/definitions/Transaction"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "transactions"
+        ],
+        "summary": "Получить транзакции"
+      },
+      "post": {
+        "operationId": "transactions_transaction_create",
+        "description": "Создать транзакцию",
+        "parameters": [
+          {
+            "name": "data",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/Transaction"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/Transaction"
+            }
+          }
+        },
+        "tags": [
+          "transactions"
+        ],
+        "summary": "Создать транзакцию"
+      },
+      "parameters": []
+    },
+    "/transactions/transaction/get_amount_transactions/": {
+      "get": {
+        "operationId": "transactions_transaction_get_amount_transactions",
+        "description": "Сумма всех доходов и расходов",
+        "parameters": [
+          {
+            "$ref": "#/parameters/start_date"
+          },
+          {
+            "$ref": "#/parameters/end_date"
+          },
+          {
+            "$ref": "#/parameters/limit"
+          },
+          {
+            "$ref": "#/parameters/offset"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "description": "",
+              "type": "object",
+              "properties": {
+                "income_summary": {
+                  "type": "number"
+                },
+                "expense_summary": {
+                  "type": "number"
+                }
+              },
+              "required": [
+                "income_summary",
+                "expense_summary"
+              ],
+              "x-examples": {
+                "example-1": {
+                  "income_summary": 350,
+                  "expense_summary": 600
+                }
+              }
+            },
+            "examples": {}
+          }
+        },
+        "tags": [
+          "transactions"
+        ],
+        "summary": "Сумма всех доходов и расходов"
+      },
+      "parameters": []
+    },
+    "/transactions/transaction/{id}/": {
+      "put": {
+        "operationId": "transactions_transaction_update",
+        "description": "Заменить транзакцию",
+        "parameters": [
+          {
+            "name": "data",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/Transaction"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/Transaction"
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "schema": {
+              "type": "object",
+              "properties": {}
+            }
+          }
+        },
+        "tags": [
+          "transactions"
+        ],
+        "summary": "Заменить транзакцию"
+      },
+      "patch": {
+        "operationId": "transactions_transaction_partial_update",
+        "description": "Обновить транзакцию",
+        "parameters": [
+          {
+            "name": "data",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/Transaction"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/Transaction"
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "schema": {
+              "type": "object",
+              "properties": {}
+            }
+          }
+        },
+        "tags": [
+          "transactions"
+        ],
+        "summary": "Обновить транзакцию"
+      },
+      "delete": {
+        "operationId": "transactions_transaction_delete",
+        "description": "Удалить транзакцию",
+        "parameters": [],
+        "responses": {
+          "204": {
+            "description": ""
+          },
+          "404": {
+            "description": "Not Found",
+            "schema": {
+              "type": "object",
+              "properties": {}
+            }
+          }
+        },
+        "tags": [
+          "transactions"
+        ],
+        "summary": "Удалить транзакцию"
+      },
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "type": "integer"
+        }
+      ]
+    },
+    "/transactions/widget/": {
+      "get": {
+        "operationId": "transactions_widget_list",
+        "description": "Получить виджеты",
+        "parameters": [
+          {
+            "$ref": "#/parameters/limit"
+          },
+          {
+            "$ref": "#/parameters/offset"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "required": [
+                "count",
+                "results"
+              ],
+              "type": "object",
+              "properties": {
+                "count": {
+                  "type": "integer"
+                },
+                "next": {
+                  "type": "string",
+                  "format": "uri",
+                  "x-nullable": true
+                },
+                "previous": {
+                  "type": "string",
+                  "format": "uri",
+                  "x-nullable": true
+                },
+                "results": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/definitions/Widget"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "widgets"
+        ],
+        "summary": "Получить виджеты"
+      },
+      "post": {
+        "operationId": "transactions_widget_create",
+        "description": "Создать виджет",
+        "parameters": [
+          {
+            "name": "data",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/Widget"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/Widget"
+            }
+          }
+        },
+        "tags": [
+          "widgets"
+        ],
+        "summary": "Создать виджет"
+      },
+      "parameters": []
+    },
+    "/transactions/widget/{id}/": {
+      "delete": {
+        "operationId": "transactions_widget_delete",
+        "description": "Удалить виджет",
+        "parameters": [],
+        "responses": {
+          "204": {
+            "description": ""
+          },
+          "404": {
+            "description": "Not Found",
+            "schema": {
+              "type": "object",
+              "properties": {}
+            }
+          }
+        },
+        "tags": [
+          "widgets"
+        ],
+        "summary": "Удалить виджет"
+      },
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "description": "A unique integer value identifying this виджет.",
+          "required": true,
+          "type": "integer"
+        }
+      ]
+    }
+  },
+  "definitions": {
+    "Category": {
+      "type": "object",
+      "x-examples": {},
+      "properties": {
+        "id": {
+          "title": "ID",
+          "type": "integer",
+          "readOnly": true
+        },
+        "owner": {
+          "title": "Владелец категории",
+          "type": "integer",
+          "readOnly": true
+        },
+        "owner_username": {
+          "title": "Owner username",
+          "type": "string",
+          "minLength": 1,
+          "readOnly": true
+        },
+        "type": {
+          "title": "Тип категории",
+          "type": "string",
+          "enum": [
+            "IN",
+            "EX"
+          ]
+        },
+        "title": {
+          "title": "Название категории",
+          "type": "string",
+          "maxLength": 128,
+          "minLength": 1
+        }
+      },
+      "required": [
+        "type",
+        "title"
+      ]
+    },
+    "Transaction": {
+      "required": [
+        "category",
+        "amount"
+      ],
+      "type": "object",
+      "properties": {
+        "id": {
+          "title": "ID",
+          "type": "integer",
+          "readOnly": true
+        },
+        "owner": {
+          "title": "Владелец транзакции",
+          "type": "integer",
+          "readOnly": true
+        },
+        "category": {
+          "title": "Категория",
+          "type": "integer"
+        },
+        "category_title": {
+          "title": "Category title",
+          "type": "string",
+          "readOnly": true,
+          "minLength": 1
+        },
+        "category_type": {
+          "title": "Category type",
+          "type": "string",
+          "readOnly": true,
+          "minLength": 1
+        },
+        "amount": {
+          "title": "Сумма",
+          "type": "integer",
+          "maximum": 2147483647,
+          "minimum": -2147483648
+        },
+        "date": {
+          "title": "Дата операции",
+          "type": "string",
+          "format": "date",
+          "readOnly": true
+        }
+      }
+    },
+    "Widget": {
+      "required": [
+        "owner",
+        "category",
+        "amount_limit",
+        "period",
+        "criterion"
+      ],
+      "type": "object",
+      "properties": {
+        "id": {
+          "title": "ID",
+          "type": "integer",
+          "readOnly": true
+        },
+        "owner": {
+          "title": "Владелец виджета",
+          "type": "integer"
+        },
+        "category": {
+          "title": "Категория виджета",
+          "type": "integer"
+        },
+        "amount_limit": {
+          "title": "Лимит суммы, которую можно потратить",
+          "type": "integer",
+          "maximum": 2147483647,
+          "minimum": -2147483648
+        },
+        "period": {
+          "title": "Срок действия",
+          "type": "integer",
+          "enum": [
+            1,
+            7,
+            30
+          ]
+        },
+        "criterion": {
+          "title": "Критерий (больше/меньше)",
+          "type": "string",
+          "enum": [
+            ">",
+            "<"
+          ]
+        },
+        "hex_color": {
+          "title": "Цвет",
+          "type": "string",
+          "maxLength": 7,
+          "minLength": 1
+        },
+        "creation_date": {
+          "title": "Дата создания",
+          "type": "string",
+          "format": "date",
+          "readOnly": true
+        },
+        "current_amount": {
+          "title": "Current amount",
+          "type": "string",
+          "readOnly": true
+        },
+        "deadline": {
+          "title": "Deadline",
+          "type": "string",
+          "readOnly": true
+        }
+      }
+    },
+    "UserInfo": {
+      "required": [
+        "username"
+      ],
+      "type": "object",
+      "properties": {
+        "id": {
+          "title": "ID",
+          "type": "integer",
+          "readOnly": true
+        },
+        "username": {
+          "title": "Имя пользователя",
+          "description": "Обязательное поле. Не более 150 символов. Только буквы, цифры и символы @/./+/-/_.",
+          "type": "string",
+          "pattern": "^[\\w.@+-]+$",
+          "maxLength": 150,
+          "minLength": 1
+        }
+      }
+    },
+    "UserCreate": {
+      "required": [
+        "email",
+        "username",
+        "password"
+      ],
+      "type": "object",
+      "properties": {
+        "email": {
+          "title": "Email адрес",
+          "type": "string",
+          "format": "email",
+          "maxLength": 254,
+          "minLength": 1
+        },
+        "username": {
+          "title": "Имя пользователя",
+          "description": "Обязательное поле. Не более 150 символов. Только буквы, цифры и символы @/./+/-/_.",
+          "type": "string",
+          "pattern": "^[\\w.@+-]+$",
+          "maxLength": 150,
+          "minLength": 1
+        },
+        "password": {
+          "title": "Пароль",
+          "type": "string",
+          "maxLength": 128,
+          "minLength": 1
+        }
+      }
+    },
+    "TokenObtainPair": {
+      "type": "object",
+      "properties": {
+        "email": {
+          "type": "string",
+          "title": "Email",
+          "minLength": 1,
+          "format": "email"
+        },
+        "password": {
+          "type": "string",
+          "title": "Password",
+          "minLength": 1,
+          "format": "password"
+        }
+      },
+      "required": [
+        "email",
+        "password"
+      ]
+    },
+    "TokenRefresh": {
+      "type": "object",
+      "title": "",
+      "properties": {
+        "refresh": {
+          "type": "string",
+          "title": "Refresh",
+          "minLength": 1,
+          "description": "Токен для обновления токена доступа"
+        },
+        "access": {
+          "type": "string",
+          "title": "Access",
+          "description": "Токен доступа"
+        }
+      },
+      "required": [
+        "refresh"
+      ]
+    }
+  },
+  "parameters": {
+    "start_date": {
+      "name": "start_date",
+      "in": "query",
+      "required": false,
+      "type": "string",
+      "format": "date",
+      "minLength": 10,
+      "maxLength": 10,
+      "description": "Фильтр, дата начала"
+    },
+    "end_date": {
+      "name": "end_date",
+      "in": "query",
+      "required": false,
+      "type": "string",
+      "format": "date",
+      "minLength": 10,
+      "maxLength": 10,
+      "description": "Фильтр, дата окончания"
+    },
+    "limit": {
+      "name": "limit",
+      "in": "query",
+      "required": false,
+      "type": "integer",
+      "description": "Количество результатов, возвращаемых на страницу"
+    },
+    "offset": {
+      "name": "offset",
+      "in": "query",
+      "required": false,
+      "type": "integer",
+      "description": "Начальный индекс, из которого возвращаются результаты"
+    }
+  },
+  "responses": {}
+}
